@@ -3,8 +3,8 @@
 #include <pthread.h>
 #include <unistd.h> 
 #define MAX_PORTS 3 
-pthread_mutex_tmutex; 
-pthread_cond_tcond; 
+pthread_mutex_t mutex; 
+pthread_cond_t cond; 
 int available_ports = MAX_PORTS; 
 void* open_port(void* id) {
     int thread_id = *(int*)id;
@@ -26,7 +26,7 @@ void* open_port(void* id) {
     return NULL;
 }
 int main() {
-    pthread_tthreads[5]; 
+    pthread_t threads[5]; 
     int thread_ids[5];
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init(&cond, NULL);

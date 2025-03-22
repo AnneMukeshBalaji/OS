@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <unistd.h> 
 #define MAX_PORTS 3 
-sem_tavailable_ports; 
+sem_t available_ports; 
 void* open_port(void* id) {
     int thread_id = *(int*)id;
     printf("Thread %d: Attempting to open a port...\n", thread_id);
@@ -16,7 +16,7 @@ void* open_port(void* id) {
     return NULL;
 }
 int main() {
-    pthread_tthreads[5]; 
+    pthread_t threads[5]; 
     int thread_ids[5];
     sem_init(&available_ports, 0, MAX_PORTS);
     for (int i = 0; i< 5; i++) {
