@@ -1,67 +1,67 @@
 #include <stdio.h>
-#include <stdlib.h>
-
-#define FRAME_COUNT 4 
-
-void lfu(int pages[], int pageCount) {
-    int frames[FRAME_COUNT];
-    int frequency[FRAME_COUNT] = {0}; 
-    int pageFaults = 0;
-    int i, j;
-    int isPresent, lfuIndex, minFrequency;
-
-    for (i = 0; i < FRAME_COUNT; i++) {
-        frames[i] = -1;
-    }
-
-    printf("LFU Page Replacement:\n");
-
-    for (i = 0; i < pageCount; i++) {
-        isPresent = 0;
-
-        for (j = 0; j < FRAME_COUNT; j++) {
-            if (frames[j] == pages[i]) {
-                isPresent = 1;
-                frequency[j]++;
-                break;
-            }
-        }
-
-        if (!isPresent) {
-            lfuIndex = 0;
-            minFrequency = frequency[0];
-
-            for (j = 1; j < FRAME_COUNT; j++) {
-                if (frequency[j] < minFrequency) {
-                    minFrequency = frequency[j];
-                    lfuIndex = j;
-                }
-            }
-
-            frames[lfuIndex] = pages[i];
-            frequency[lfuIndex] = 1;
-            pageFaults++;
-        }
-
-        printf("After accessing page %d: ", pages[i]);
-        for (j = 0; j < FRAME_COUNT; j++) {
-            if (frames[j] == -1) {
-                printf(" _ ");
-            } else {
-                printf(" %d ", frames[j]);
-            }
-        }
-        printf("\n");
-    }
-
-    printf("\nTotal Page Faults: %d\n", pageFaults);
-}
 
 int main() {
-    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 3};
-    int pageCount = sizeof(pages) / sizeof(pages[0]);
+	int i, j, min, rs[25], m[10], count[10], flag[25], n, f, pf = 0, next = 1;
 
-    lfu(pages, pageCount);
+	printf("Enter the length of reference string -- ");
+	scanf("%d", &n);
 
-    return 0;
+	printf("Enter the reference string -- ");
+	for (i = 0; i < n; i++) {
+		scanf("%d", &rs[i]);
+		flag[i] = 0;
+	}
+
+	printf("Enter the number of frames -- ");
+	scanf("%d", &f);
+
+	for (i = 0; i < f; i++) {
+		count[i] = 0;
+		m[i] = -1;
+	}
+
+	printf("\nThe Page Replacement process is -- \n");
+	for (i = 0; i < n; i++) {
+		flag[i] = 0;
+		printf("\nReference: %d -> ", rs[i]);
+
+		for (j = 0; j < f; j++) {
+			if (m[j] == rs[i]) {  
+				flag[i] = 1;
+				count[j] = next;
+				next++;
+				break;
+			}
+		}
+
+		if (flag[i] == 0) {  
+			pf++; 
+
+			if (i < f) { 
+				m[i] = rs[i];
+				count[i] = next;
+				next++;
+			} else { 
+				min = 0;
+				for (j = 1; j < f; j++) {
+					if (count[min] > count[j])
+						min = j;
+				}
+				m[min] = rs[i];
+				count[min] = next;
+				next++;
+			}
+		}
+
+		for (j = 0; j < f; j++) {
+			if (m[j] != -1)
+				printf("%d ", m[j]);
+			else
+				printf("- ");
+		}
+	}
+
+	printf("\n\nTotal Page Faults: %d\n", pf);
+	return 0;
 }
+

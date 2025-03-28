@@ -1,67 +1,84 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-#define FRAME_COUNT 4 
+#define MAX_FRAMES 10
+#define MAX_PAGES 50
 
-void lfu(int pages[], int pageCount) {
-    int frames[FRAME_COUNT];
-    int frequency[FRAME_COUNT] = {0}; 
-    int pageFaults = 0;
-    int i, j;
-    int isPresent, lfuIndex, minFrequency;
+// Function to find the LFU page index
+int findLFUIndex(int frames[], int freq[], int frameCount) {
+	int minFreq = freq[0], index = 0;
 
-    for (i = 0; i < FRAME_COUNT; i++) {
-        frames[i] = -1;
-    }
+	for (int i = 1; i < frameCount; i++) {
+		if (freq[i] < minFreq) {
+			minFreq = freq[i];
+			index = i;
+		}
+	}
+	return index;
+}
 
-    printf("LFU Page Replacement:\n");
+// Function to implement LFU page replacement
+void lfuPageReplacement(int pages[], int pageCount, int frameCount) {
+	int frames[MAX_FRAMES], freq[MAX_FRAMES] = {0};
+	int pageFaults = 0, isPresent, index;
 
-    for (i = 0; i < pageCount; i++) {
-        isPresent = 0;
+	// Initialize frames to -1 (indicating empty)
+	for (int i = 0; i < frameCount; i++)
+		frames[i] = -1;
 
-        for (j = 0; j < FRAME_COUNT; j++) {
-            if (frames[j] == pages[i]) {
-                isPresent = 1;
-                frequency[j]++;
-                break;
-            }
-        }
+	printf("\nPage Reference\tFrames\n");
 
-        if (!isPresent) {
-            lfuIndex = 0;
-            minFrequency = frequency[0];
+	for (int i = 0; i < pageCount; i++) {
+		isPresent = 0;
 
-            for (j = 1; j < FRAME_COUNT; j++) {
-                if (frequency[j] < minFrequency) {
-                    minFrequency = frequency[j];
-                    lfuIndex = j;
-                }
-            }
+		// Check if the page is already in memory
+		for (int j = 0; j < frameCount; j++) {
+			if (frames[j] == pages[i]) {
+				isPresent = 1;
+				freq[j]++;  // Increase frequency count
+				break;
+			}
+		}
 
-            frames[lfuIndex] = pages[i];
-            frequency[lfuIndex] = 1;
-            pageFaults++;
-        }
+		// Page fault if the page is not in memory
+		if (!isPresent) {
+			if (i < frameCount) {
+				// Fill empty frames first
+				frames[i] = pages[i];
+				freq[i] = 1;
+			} else {
+				// Replace the least frequently used page
+				index = findLFUIndex(frames, freq, frameCount);
+				frames[index] = pages[i];
+				freq[index] = 1; // Reset frequency for the new page
+			}
+			pageFaults++;
+		}
 
-        printf("After accessing page %d: ", pages[i]);
-        for (j = 0; j < FRAME_COUNT; j++) {
-            if (frames[j] == -1) {
-                printf(" _ ");
-            } else {
-                printf(" %d ", frames[j]);
-            }
-        }
-        printf("\n");
-    }
+		// Print the current memory state
+		printf("%d\t\t", pages[i]);
+		for (int j = 0; j < frameCount; j++) {
+			if (frames[j] == -1)
+				printf("_ ");
+			else
+				printf("%d ", frames[j]);
+		}
+		printf("\n");
+	}
 
-    printf("\nTotal Page Faults: %d\n", pageFaults);
+	printf("\nTotal Page Faults: %d\n", pageFaults);
 }
 
 int main() {
-    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 3};
-    int pageCount = sizeof(pages) / sizeof(pages[0]);
+	int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
+	int pageCount = sizeof(pages) / sizeof(pages[0]);
+	int frameCount;
 
-    lfu(pages, pageCount);
+	printf("Enter the number of frames: ");
+	scanf("%d", &frameCount);
 
-    return 0;
+	lfuPageReplacement(pages, pageCount, frameCount);
+
+	return 0;
 }
+
+

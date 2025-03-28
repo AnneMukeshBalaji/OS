@@ -1,54 +1,36 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#define FRAME_COUNT 4 
-
-void fifo(int pages[], int pageCount) {
-    int frames[FRAME_COUNT];
-    int pageFaults = 0;
-    int i, j;
-    int isPresent;
-
-    for (i = 0; i < FRAME_COUNT; i++) {
-        frames[i] = -1;
-    }
-
-    printf("FIFO Page Replacement:\n");
-
-    for (i = 0; i < pageCount; i++) {
-        isPresent = 0;
-
-        for (j = 0; j < FRAME_COUNT; j++) {
-            if (frames[j] == pages[i]) {
-                isPresent = 1;
-                break;
-            }
-        }
-
-        if (!isPresent) {
-            frames[pageFaults % FRAME_COUNT] = pages[i];
-            pageFaults++;
-        }
-
-        printf("After accessing page %d: ", pages[i]);
-        for (j = 0; j < FRAME_COUNT; j++) {
-            if (frames[j] == -1) {
-                printf(" _ ");
-            } else {
-                printf(" %d ", frames[j]);
-            }
-        }
-        printf("\n");
-    }
-
-    printf("\nTotal Page Faults: %d\n", pageFaults);
+#include<stdio.h>
+int main()
+{
+	int i,j,n,a[50],frame[10],no,k,avail,count=0;
+	printf("\n ENTER THE NUMBER OF PAGES:\n");
+	scanf("%d",&n);
+	printf("\n ENTER THE PAGE NUMBER :\n");
+	for(i=1;i<=n;i++)
+		scanf("%d",&a[i]);
+	printf("\n ENTER THE NUMBER OF FRAMES :");
+	scanf("%d",&no);
+	for(i=0;i<no;i++)
+		frame[i]= -1;
+	j=0;
+	printf("\tref string\t page frames\n");
+	for(i=1;i<=n;i++)
+	{
+		printf("%d\t\t",a[i]);
+		avail=0;
+		for(k=0;k<no;k++)
+			if(frame[k]==a[i])
+				avail=1;
+		if (avail==0)
+		{
+			frame[j]=a[i];
+			j=(j+1)%no;
+			count++;
+			for(k=0;k<no;k++)
+				printf("%d\t",frame[k]);
+		}
+		printf("\n");
+	}
+	printf("Page Fault Is %d",count);
+	return 0;
 }
 
-int main() {
-    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 3};
-    int pageCount = sizeof(pages) / sizeof(pages[0]);
-
-    fifo(pages, pageCount);
-
-    return 0;
-}
